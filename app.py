@@ -49,28 +49,28 @@ def home():
                                user_info=ut.get(attr='user_description'))
 
 
-# TODO This isn't working
 @app.route("/initialization", methods=['GET', 'POST'])
 def initialization():
     if request.method == 'POST':
         user_name = request.form['user_name']
-        user_description = request.form['user_description ']
+        user_description = request.form['user_description']
         ut = UserTable()
         if user_description is not u'':
             ut.insert(user_name, user_description)
         else:
             ut.insert(user_name)
-            return redirect(url_for('home'))
-    return '''
-    <!doctype html>
-    <title>First time login</title>
-    <h1>Upload a Picture of yours</h1>
-    <form action="" method=post enctype=multipart/form-data>
-        Name : <input type=text name=user_name>
-        About yourself : <input type=text name=user_description>
-         <input type=submit value=Done>
-    </form>
-    '''
+        return redirect(url_for('home'))
+    else:
+        return '''
+        <!doctype html>
+        <title>First time login</title>
+        <h1>Upload a Picture of yours</h1>
+        <form action="" method=post enctype=multipart/form-data>
+            Name : <input type=text name=user_name>
+            About yourself : <input type=text name=user_description>
+             <input type=submit value=Done>
+        </form>
+        '''
 
 
 @app.route("/profilePicture_<size>")

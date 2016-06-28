@@ -1,4 +1,4 @@
 #!/bin/bash
-IMGPATH=/home/comslav/user_file_uploads
+IMG_PATH=${IHS_DATA_DIR}
 FILENAME=$1
-convert ${IMGPATH}/${FILENAME} -resize 75x75\> ${IMGPATH}/${FILENAME}_thumbs.png
+convert ${IMG_PATH}/${FILENAME} -resize 75x75\> ${IMG_PATH}/${FILENAME}_thumbs.png

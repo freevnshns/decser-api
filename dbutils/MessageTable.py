@@ -58,7 +58,7 @@ class MessageTable:
         try:
             self.cursor.execute(query)
         except Error as e:
-            if str(e) == "no such table: " + self.NAME:
+            if str(e) == ("no such table: " + self.NAME):
                 self.create()
                 self.insert(data, ip, category, sender)
         data = self.dbConnection.get()

@@ -42,13 +42,13 @@ class ChatTable:
         self.dbConnection.close_connection()
 
     def insert(self, message, sender="Anonymous"):
-        query = "INSERT INTO " + self.NAME + "(" + self.COLUMN_MESSAGE_DATA + "," + self.COLUMN_MESSAGE_SENDER + "," + self.COLUMN_MESSAGE_DATE + "," + self.COLUMN_MESSAGE_TIME + ")VALUES ('%s','%s',CURDATE(),CURTIME());" % (
+        query = "INSERT INTO " + self.NAME + "(" + self.COLUMN_MESSAGE_DATA + "," + self.COLUMN_MESSAGE_SENDER + "," + self.COLUMN_MESSAGE_DATE + "," + self.COLUMN_MESSAGE_TIME + ")VALUES ('%s','%s',date('now'),time('now'));" % (
             message, sender)
         try:
             self.cursor.execute(query)
         except Error as e:
             print e
-            if str(e) == "no such table: " + self.NAME:
+            if str(e) == ("no such table: " + self.NAME):
                 self.create()
                 self.insert(message, sender)
         data = self.dbConnection.get()
@@ -67,4 +67,4 @@ class ChatTable:
         if results:
             return results
         else:
-            return False
+            return 0
