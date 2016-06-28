@@ -36,12 +36,12 @@ class FileTable:
         self.dbConnection.close_connection()
 
     def insert(self, file_name, file_type):
-        query = "INSERT INTO " + self.NAME + "(" + self.COLUMN_FILE_NAME + "," + self.COLUMN_FILE_TYPE + "," + self.COLUMN_FILE_UPLOAD_DATE + ")VALUES ('%s','%s',CURDATE());" % (
+        query = "INSERT INTO " + self.NAME + "(" + self.COLUMN_FILE_NAME + "," + self.COLUMN_FILE_TYPE + "," + self.COLUMN_FILE_UPLOAD_DATE + ")VALUES ('%s','%s',date('now'));" % (
             file_name, file_type)
         try:
             self.cursor.execute(query)
         except Error as e:
-            if e.args[0] == 1146:
+            if str(e) == "no such table: " + self.NAME:
                 self.create()
                 self.insert(file_name, file_type)
         data = self.dbConnection.get()

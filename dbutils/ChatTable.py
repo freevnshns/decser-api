@@ -48,7 +48,7 @@ class ChatTable:
             self.cursor.execute(query)
         except Error as e:
             print e
-            if e.args[0] == 1146:
+            if str(e) == "no such table: " + self.NAME:
                 self.create()
                 self.insert(message, sender)
         data = self.dbConnection.get()
@@ -60,7 +60,7 @@ class ChatTable:
             self.cursor.execute(query)
         except Error as e:
             print e
-            if e.args[0] == 1146:
+            if str(e) == "no such table: " + self.NAME:
                 self.create()
 
         results = self.cursor.fetchall()

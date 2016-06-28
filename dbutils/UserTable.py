@@ -28,21 +28,20 @@ class UserTable:
         self.dbConnection.close_connection()
 
     def get(self, **kwargs):
-        if (kwargs.get('attr') == 'user_name'):
+        if kwargs.get('attr') == 'user_name':
             query = " SELECT " + self.COLUMN_USER_NAME + " FROM " + self.NAME + " ;"
-        elif (kwargs.get('attr') == 'user_info'):
+        else:
             query = " SELECT " + self.COLUMN_USER_INFO + " FROM " + self.NAME + " ;"
         try:
             self.cursor.execute(query)
-        except Error as e:
-            if e.args[0] == 1146:
-                return False
-        results = self.cursor.fetchall()
-        for row in results:
-            if row:
-                return row[0]
-            else:
-                return 'Anonymous'
+            results = self.cursor.fetchall()
+            for row in results:
+                if row:
+                    return row[0]
+                else:
+                    return False
+        except Error:
+            return False
 
     def insert(self, user_name, user_info="Write something about yourself...."):
         query = "INSERT INTO " + self.NAME + "(" + self.COLUMN_USER_NAME + "," + self.COLUMN_USER_INFO + ")VALUES ('%s','%s');" % (
@@ -51,14 +50,14 @@ class UserTable:
             self.cursor.execute(query)
         except Error as e:
             print e
-            if e.args[0] == 1146:
+            if str(e) == "no such table: " + self.NAME:
                 self.create()
                 self.insert(user_name, user_info)
         data = self.dbConnection.get()
         data.commit()
 
     def edit(self, user_info):
-        query = "UPDATE " + self.NAME + " SET " + self.COLUMN_USER_INFO + " = '%s';" % (user_info)
+        query = "UPDATE " + self.NAME + " SET " + self.COLUMN_USER_INFO + " = '%s';" % user_info
         try:
             self.cursor.execute(query)
         except Error as e:

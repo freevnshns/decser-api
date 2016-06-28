@@ -10,7 +10,7 @@ class MessageTable:
         self.NAME = "messages_table"
 
         self.COLUMN_MESSAGE_ID = "mid"
-        self.COLUMN_MESSAGE_ID_TYPE = "INT NOT NULL AUTO_INCREMENT"
+        self.COLUMN_MESSAGE_ID_TYPE = "INT NOT NULL AUTOINCREMENT"
 
         self.COLUMN_MESSAGE_DATE = "message_date"
         self.COLUMN_MESSAGE_DATE_TYPE = "date"
@@ -53,12 +53,12 @@ class MessageTable:
             print e
 
     def insert(self, data, ip, category, sender="Anonymous"):
-        query = "INSERT INTO " + self.NAME + "(" + self.COLUMN_MESSAGE_DATA + "," + self.COLUMN_MESSAGE_IP + "," + self.COLUMN_MESSAGE_SENDER + "," + self.COLUMN_MESSAGE_DATE + "," + self.COLUMN_MESSAGE_CATEGORY + ")VALUES ('%s','%s','%s',CURDATE(),'%s');" % (
+        query = "INSERT INTO " + self.NAME + "(" + self.COLUMN_MESSAGE_DATA + "," + self.COLUMN_MESSAGE_IP + "," + self.COLUMN_MESSAGE_SENDER + "," + self.COLUMN_MESSAGE_DATE + "," + self.COLUMN_MESSAGE_CATEGORY + ")VALUES ('%s','%s','%s',date('now'),'%s');" % (
             data, ip, sender, category)
         try:
             self.cursor.execute(query)
         except Error as e:
-            if e.args[0] == 1146:
+            if str(e) == "no such table: " + self.NAME:
                 self.create()
                 self.insert(data, ip, category, sender)
         data = self.dbConnection.get()
