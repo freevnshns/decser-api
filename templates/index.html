@@ -1,0 +1,235 @@
+<!doctype html>
+<!--[if IE 9]>
+<html class="lt-ie10" lang="en"> <![endif]-->
+<html class="no-js" lang="en">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>{{user_name}} | Dashboard</title>
+    <meta name="description" content="Your Home on the Internet "/>
+    <meta name="author" content="Siddhant Gupta"/>
+    <meta name="copyright" content="Comslav Copyright (c) 2015"/>
+    <link rel="icon" type="image/ico" href="{{url_for('static',filename='icons/favicon.ico')}}">
+    <link rel="stylesheet" href="{{ url_for('static',filename='bower_components/foundation/css/foundation.css')}}"/>
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/custom.css')}}"/>
+    <script src="{{ url_for('static',filename='bower_components/modernizr/modernizr.js')}}"></script>
+    <script src="{{ url_for('static',filename='js/custom.js')}}"></script>
+</head>
+
+<body>
+<nav class="top-bar" data-topbar role="navigation">
+    <ul class="title-area">
+        <li class="name">
+            <h1 id="logo-font"><a href="#">Comslav</a>
+                <li>
+            </h1>
+        </li>
+    </ul>
+</nav>
+<header>
+    <div class="row">
+        <div class="large-6 columns" id="profile-image">
+            <a href="#" data-reveal-id="change-Profile-Picture">
+                <img src="/profilePicture_S"
+                     srcset="/profilePicture_S 400w, /profilePicture_M 800w, /profilePicture_L 1200w"
+                     alt="Upload a Picture of yours :)" id="profile-image-inset">
+            </a>
+            <br>
+        </div>
+        <div class="large-6 columns">
+            <h3 class="show-for-small" id="user-name">
+                {{user_name}}
+                <hr/>
+            </h3>
+            <h1 class="hide-for-small" id="user-name">
+                {{user_name}}
+                <hr/>
+            </h1>
+            <a href="#" data-reveal-id="description-change-modal">
+                <h4 class="subheader hide-for-small" id="user-info">
+                    {{user_info}}
+                </h4>
+            </a>
+            <a href="/editDescription">
+                <h3 class="subheader show-for-small" id="user-info">
+                    {{user_info}}
+                </h3>
+            </a>
+        </div>
+    </div>
+</header>
+<div class="row" id="control-panel">
+    <div class="large-6 columns">
+        <div class="radius panel" id="panel-material">
+            <fieldset>
+                <legend>Inbox</legend>
+                <div class="row collapse">
+                    <div class="large-3 small-5 columns">
+                        <a href="#" data-reveal-id="personal-message-modal" onclick="loadMessages('personal');"
+                           class="prefix button expand">Personal</a>
+                    </div>
+                    <div class="large-3 small-5 columns">
+                        <a href="#" data-reveal-id="work-message-modal" onclick="loadMessages('work')"
+                           class="postfix button expand">Work</a>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+    <div class="large-6 columns">
+        <div class="radius panel" id="panel-material">
+            <fieldset>
+                <legend>File Sharing</legend>
+                <div class="row collapse">
+                    <div class="large-3 small-5 columns">
+                        <a href="#" data-reveal-id="file-upload-modal" class="prefix button expand"
+                           onclick="loadFiles()">Upload</a>
+                    </div>
+                    <div class="large-3 small-5 columns">
+                        <a href="#" data-reveal-id="file-delete-modal" class="postfix button expand"
+                           onclick="loadFilesDelete()">Delete</a>
+                    </div>
+                </div>
+            </fieldset>
+        </div>
+    </div>
+</div>
+<div class="row" id="chatToggle">
+    <div class="small-3 small-centered large-centered columns">
+        <a class="button tiny expand">
+            Show Shoutbox
+        </a>
+    </div>
+</div>
+<div class="row chat">
+    <div class="large-12 columns">
+        <div class="radius panel" id="panel-material">
+            <ul id="chat_message_box">
+                <!-- <li></li> -->
+            </ul>
+        </div>
+    </div>
+</div>
+<div class="row panel chat" id="panel-material">
+    <fieldset>
+        <legend>Shoutbox</legend>
+        <div class="large-8 small-8 columns">
+            <input type="text" name="chat_message" id="chat_message" placeholder="Press Enter to Send"/>
+        </div>
+        <div class="large-4 small-4 columns">
+            <input type="text" id="chat_message_sender" placeholder="Name"/>
+        </div>
+    </fieldset>
+</div>
+<div id="personal-message-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true"
+     role="dialog">
+    <h3 id="modalTitle">
+        Personal Messages :
+    </h3>
+    <ul class="accordion" id="messages-list-personal" data-accordion>
+        <!-- <li class="accordion-navigation">
+            <a href="#panel1">Accordion</a>
+            <div id="panel1" class="content">
+                MessageText
+            </div>
+        </li> -->
+    </ul>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+<div id="work-message-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true"
+     role="dialog">
+    <h3 id="modalTitle">
+        Work-related Messages
+    </h3>
+    <ul class="accordion" id="messages-list-work" data-accordion>
+        <!-- <li class="accordion-navigation">
+            <a href="#panel1">Accordion</a>
+            <div id="panel1" class="content">
+                MessageText
+            </div>
+        </li> -->
+    </ul>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+<div id="file-upload-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true"
+     role="dialog">
+    <h3 id="modalTitle">
+        Select a file to upload
+    </h3>
+
+    <form action="/uploadFiles" method=post enctype=multipart/form-data>
+        <p>
+            <input type=file name=file>
+            <input type=submit class="button tiny round" value=Upload>
+    </form>
+    <ul id="file-list" class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
+        <!-- <li></li> -->
+    </ul>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+<div id="file-delete-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true"
+     role="dialog">
+    <h3 id="modalTitle">
+        Select file to delete
+    </h3>
+    <ul id="file-list-delete" class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
+        <!-- <li></li> -->
+    </ul>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+<div id="description-change-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true"
+     role="dialog">
+    <h3 id="modalTitle">
+        Enter a new description for yourself
+    </h3>
+
+    <form action="/editDescription" method="POST">
+        <input type="text" name="description">
+        <input type="submit" value="Change">
+    </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+<div id="change-Profile-Picture" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true"
+     role="dialog">
+    <h3 id="modalTitle">
+        Change your Display Picture
+    </h3>
+
+    <form action="/changeProfilePicture" method=post enctype=multipart/form-data>
+        <p>
+            <input type=file name=file>
+            <input type=submit value=Upload>
+    </form>
+    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
+</div>
+<script src="{{ url_for('static',filename='bower_components/jquery/dist/jquery.js')}}"></script>
+<script src="{{ url_for('static',filename='bower_components/foundation/js/foundation.min.js')}}"></script>
+<script type="text/javascript">
+    "use strict";
+    $(document).foundation();
+    var doc = document.documentElement;
+    doc.setAttribute('data-useragent', navigator.userAgent);
+    jQuery(document).ready(function($) {
+        $('.chat').hide('fast');
+        $('#chatToggle').on('click', function(event) {
+            event.preventDefault();
+            /* Act on the event */
+            $(this).hide('slow');
+            $('header').slideUp('slow');
+            $('.chat').show('fast');
+            retrieveChat();
+            $('#chat_message_box').before('<div class="row collapse"><div class="small-3 small-centered large-centered columns"><a class="secondary button tiny expand" id="refresher">Refresh</a></div></div>');
+            $('#refresher').on('click', function(event) {
+                event.preventDefault();
+                /* Act on the event */
+                retrieveChat();
+            });
+        });
+    });
+    var triggerLink = document.getElementById("chat_message");
+    triggerLink.addEventListener('keyup', send_chat_message, false);
+
+</script>
+</body>
+
+</html>
