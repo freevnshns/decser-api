@@ -1,16 +1,13 @@
-from MySQLdb import connect
+import sqlite3
 
 
 class DatabaseConnection:
     def __init__(self, **kwargs):
-        self.host = kwargs.get('host', 'localhost')
-        self.user = kwargs.get('user', 'root')
-        self.password = kwargs.get('password', '')
-        self.database = kwargs.get('database', 'HomeBase')
-        self.db = connect(self.host, self.user, self.password, self.database)
+        self.database = kwargs.get('database', 'web-application')
+        self.db = sqlite3.connect(self.database)
 
     def get(self):
         return self.db
 
-    def closeConnection(self):
+    def close_connection(self):
         self.db.close()

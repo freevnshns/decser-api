@@ -1,32 +1,31 @@
 import os
 import subprocess
+from json import loads
 from re import escape
 from string import lstrip
-from json import loads
 
 from flask import Flask, render_template, request, url_for, redirect, Response, send_file
 from werkzeug.utils import secure_filename
 
-from dbutils.user_table import usertable
-from dbutils.messages_table import messages_table
-from dbutils.files_table import files_table
-from dbutils.chat_table import chat_table
+from dbutils.ChatTable import ChatTable
+from dbutils.FileTable import FileTable
+from dbutils.MessageTable import MessageTable
+from dbutils.UserTable import UserTable
 
+app = Flask(__name__)
+# SHELL_SCRIPTS_FOLDER = '/var/www/comslav/secureAdminDash/cron_jobs/'
+# USER_ASSETS_FOLDER = '/home/comslav/user_assets/'
+# UPLOADED_FILES_FOLDER = '/home/comslav/user_file_uploads/'
+# ASSETS_FOLDER = '/var/www/comslav/secureAdminDash/front/static/'
+ALLOWED_PHOTO_EXTENSIONS = {'png', 'jpg', 'jpeg'}
+ALLOWED_FILE_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'flac', 'm4a', 'mp4', 'apk'}
 
-app = Flask(__name__, static_folder='/var/www/comslav/secureAdminDash/front/static',
-            template_folder='/var/www/comslav/secureAdminDash/front/public_html')
-SHELL_SCRIPTS_FOLDER = '/var/www/comslav/secureAdminDash/cron_jobs/'
-USER_ASSETS_FOLDER = '/home/comslav/user_assets/'
-UPLOADED_FILES_FOLDER = '/home/comslav/user_file_uploads/'
-ASSETS_FOLDER = '/var/www/comslav/secureAdminDash/front/static/'
-ALLOWED_PHOTO_EXTENSIONS = {'png', 'jpg', 'jpeg', 'JPG'}
-ALLOWED_FILE_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif','mp3','flac','m4a','mp4'}
+app.config['DATA_FOLDER'] = os.environ['IHS_DATA_DIR']
 
-app.config['USER_ASSETS_FOLDER'] = USER_ASSETS_FOLDER
-app.config['UPLOADED_FILES_FOLDER'] = UPLOADED_FILES_FOLDER
 
 def allowed_photo(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_PHOTO_EXTENSIONS
+
 
 def allowed_file(filename):
     return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_FILE_EXTENSIONS
@@ -34,22 +33,21 @@ def allowed_file(filename):
 
 @app.route("/")
 def home():
-    ut = usertable()
+    ut = UserTable()
     if ut.get(attr='user_info') is False:
         return redirect(url_for('initialization'))
     else:
-        index_response = Response(
-            render_template('index.html', user_name=ut.get(attr='user_name'), user_info=ut.get(attr='user_info')))
-        return index_response
+        return render_template('index.html', user_name=ut.get(attr='user_name'), user_info=ut.get(attr='user_info'))
 
-@app.route("/initialization", methods=['GET','POST'])
+
+@app.route("/initialization", methods=['GET', 'POST'])
 def initialization():
     if request.method == 'POST':
         uname = request.form['uname']
         udesc = request.form['udesc']
-        ut = usertable()
+        ut = UserTable()
         if udesc is not u'':
-            ut.insert(uname,udesc)
+            ut.insert(uname, udesc)
         else:
             ut.insert(uname)
         file = request.files['file']
@@ -74,22 +72,19 @@ def initialization():
     '''
 
 
-
 @app.route("/profilePicture_<size>")
-def profilePicture(size):
-    return send_file(USER_ASSETS_FOLDER + "profilePicture_"+size+".jpg", mimetype="image/jpeg")
-
-
+def profile_picture(size):
+    return send_file(app.config['DATA_FOLDER'] + "profilePicture_" + size + ".jpg", mimetype="image/jpeg")
 
 
 @app.route("/changeProfilePicture", methods=['GET', 'POST'])
-def uploadProfilePicture():
+def change_profile_picture():
     if request.method == 'POST':
         file = request.files['file']
         if file and allowed_photo(file.filename):
             file.save(os.path.join(app.config['USER_ASSETS_FOLDER'], "profilePicture.jpg"))
             try:
-                subprocess.check_call(["/bin/bash", SHELL_SCRIPTS_FOLDER + "reduce_image.sh"],
+                subprocess.check_call(["/bin/bash", app.config['DATA_FOLDER'] + "reduce_image.sh"],
                                       shell=False)
             except subprocess.CalledProcessError as e:
                 print e
@@ -106,9 +101,9 @@ def uploadProfilePicture():
 
 
 @app.route("/editDescription", methods=['POST'])
-def editDescription():
+def edit_description():
     description = request.form['description']
-    ut = usertable()
+    ut = UserTable()
     description = escape(description)
     ut.edit(description)
     return redirect(url_for('home'))
@@ -116,7 +111,7 @@ def editDescription():
 
 @app.route("/get<category>Messages")
 def getPersonalMessages(category):
-    mt = messages_table()
+    mt = MessageTable()
     messages = mt.get(category=category)
     if messages is False:
         messages_json_response = '{ "messages" : [{"count": "0"}]}'
@@ -137,12 +132,12 @@ def uploadFiles():
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         file.save(os.path.join(app.config['UPLOADED_FILES_FOLDER'], filename))
-        ft = files_table()
+        ft = FileTable()
         ft.insert(filename, filename.rsplit('.', 1)[1])
         if (filename.rsplit('.', 1)[1] in {"jpg", "png", "JPG", "PNG", "jpeg", "JPEG"}):
             try:
                 subprocess.check_call(
-                    ["/bin/bash", SHELL_SCRIPTS_FOLDER + "create_thumbs.sh", filename],
+                    ["/bin/bash", app.config['DATA_FOLDER'] + "create_thumbs.sh", filename],
                     shell=False)
             except subprocess.CalledProcessError as e:
                 print e
@@ -151,7 +146,7 @@ def uploadFiles():
 
 @app.route("/getFileList")
 def getFileList():
-    ft = files_table()
+    ft = FileTable()
     files = ft.get()
     if files is False:
         files_json_response = '{ "files" : [{"count": "0"}]}'
@@ -168,11 +163,11 @@ def getFileList():
 
 @app.route("/deleteFile_<filename>")
 def deleteFile(filename):
-    ft = files_table()
+    ft = FileTable()
     try:
-        if not subprocess.check_call(["rm", "-f", UPLOADED_FILES_FOLDER + filename + "_thumbs.png"],
+        if not subprocess.check_call(["rm", "-f", app.config['DATA_FOLDER'] + filename + "_thumbs.png"],
                                      shell=False) and not subprocess.check_call(
-                ["rm", "-f", UPLOADED_FILES_FOLDER + filename], shell=False):
+            ["rm", "-f", app.config['DATA_FOLDER'] + filename], shell=False):
             ft.remove(filename)
     except subprocess.CalledProcessError as e:
         print e
@@ -182,14 +177,14 @@ def deleteFile(filename):
 @app.route("/thumbnail_<file_name>")
 def getThumbnail(file_name):
     if file_name.rsplit('.', 1)[1] in ALLOWED_PHOTO_EXTENSIONS:
-        return send_file(UPLOADED_FILES_FOLDER + file_name + "_thumbs.png", mimetype="image/png")
+        return send_file(app.config['DATA_FOLDER'] + file_name + "_thumbs.png", mimetype="image/png")
     else:
-        return send_file(ASSETS_FOLDER+"icons/img_icons/document_icon.png", mimetype="image/png")
+        return send_file(app.config['DATA_FOLDER'] + "icons/img_icons/document_icon.png", mimetype="image/png")
 
 
 @app.route("/chatUpdates", methods=["POST"])
 def chatUpdates():
-    ct = chat_table()
+    ct = ChatTable()
     chat_message = loads(request.data)
     ct.insert(escape(chat_message['chat_message']), escape(chat_message['chat_message_sender']))
     return Response('{"status":"ok"}', mimetype='application/json')
@@ -197,7 +192,7 @@ def chatUpdates():
 
 @app.route("/retrieveChat")
 def retrieveChat():
-    ct = chat_table()
+    ct = ChatTable()
     chat_messages = ct.get()
     chat_messages_json_response = '{ "chat_messages" : [{"count": "' + str(len(chat_messages) + 1) + '"},'
     for chat_message in chat_messages:
@@ -212,11 +207,6 @@ def retrieveChat():
     chat_messages_json_response += ']}'
     return Response(chat_messages_json_response, mimetype='application/json')
 
-#To Be Implemented next
-# @app.route("/addNote")
-# def addNote():
-
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0",debug=True)
-
+    app.run(host="0.0.0.0", debug=True)

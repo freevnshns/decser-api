@@ -1,18 +1,16 @@
 <!doctype html>
-<!--[if IE 9]>
-<html class="lt-ie10" lang="en"> <![endif]-->
-<html class="no-js" lang="en">
+<html lang="en" dir="ltr">
 <head>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
     <title>{{user_name}} | Dashboard</title>
-    <meta name="description" content="Your Home on the Internet "/>
-    <meta name="author" content="Siddhant Gupta"/>
-    <meta name="copyright" content="Comslav Copyright (c) 2015"/>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
     <link rel="icon" type="image/ico" href="{{url_for('static',filename='icons/favicon.ico')}}">
-    <link rel="stylesheet" href="{{ url_for('static',filename='bower_components/foundation/css/foundation.css')}}"/>
+
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/foundation.css')}}"/>
     <link rel="stylesheet" href="{{ url_for('static',filename='css/custom.css')}}"/>
-    <script src="{{ url_for('static',filename='bower_components/modernizr/modernizr.js')}}"></script>
+
     <script src="{{ url_for('static',filename='js/custom.js')}}"></script>
 </head>
 
@@ -20,9 +18,8 @@
 <nav class="top-bar" data-topbar role="navigation">
     <ul class="title-area">
         <li class="name">
-            <h1 id="logo-font"><a href="#">Comslav</a>
-                <li>
-            </h1>
+            <h1 id="logo-font"><a href="#">Comslav</a></h1>
+        <li>
         </li>
     </ul>
 </nav>
@@ -202,8 +199,8 @@
     </form>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
-<script src="{{ url_for('static',filename='bower_components/jquery/dist/jquery.js')}}"></script>
-<script src="{{ url_for('static',filename='bower_components/foundation/js/foundation.min.js')}}"></script>
+<script src="{{ url_for('static',filename='js/jquery.js')}}"></script>
+<script src="{{ url_for('static',filename='js/foundation.js')}}"></script>
 <script type="text/javascript">
     "use strict";
     $(document).foundation();
@@ -228,6 +225,9 @@
     });
     var triggerLink = document.getElementById("chat_message");
     triggerLink.addEventListener('keyup', send_chat_message, false);
+
+
+
 
 </script>
 </body>
