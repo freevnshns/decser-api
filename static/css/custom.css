@@ -86,3 +86,7 @@ fieldset legend {
 #modalTitle {
     font-family: 'railway';
 }
+
+.title-bar{
+    box-shadow          : 0em .2em .1em #d0d0d0;
+}

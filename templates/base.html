@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+    <meta charset="utf-8"/>
+    <title>{{user_name}} | Dashboard</title>
+    <meta http-equiv="x-ua-compatible" content="ie=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+
+    <link rel="icon" type="image/ico" href="{{url_for('static',filename='icons/favicon.ico')}}">
+
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/app.css')}}"/>
+    <link rel="stylesheet" href="{{ url_for('static',filename='css/custom.css')}}"/>
+
+    <script src="{{ url_for('static',filename='js/app.js')}}"></script>
+    <script src="{{ url_for('static',filename='js/custom.js')}}"></script>
+</head>
+<body>
+<div class="grid-frame vertical">
+    <div class="primary title-bar">
+        <div class="center">
+            <a href="#" data-reveal-id="change-Profile-Picture">
+                <img src="/profilePicture_S"
+                     srcset="/profilePicture_S 400w, /profilePicture_M 800w, /profilePicture_L 1200w"
+                     alt="Upload a Profile Picture" id="profile-image-inset">
+            </a>
+        </div>
+        <div class="left">
+        </div>
+        <div class="right">
+            <h1 id="user-name">{{user_name}}</h1>
+            <a href="#" data-reveal-id="description-change-modal"><h3 id="user-info">{{user_description}}</h3></a>
+        </div>
+    </div>
+    {% block content %}
+    {% endblock %}
+</div>
+</body>
+</html>
