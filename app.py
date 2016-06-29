@@ -45,7 +45,7 @@ def home():
     if ut.get(attr='user_name') is None:
         return redirect(url_for('initialization'))
     else:
-        return render_template('base.html', user_name=ut.get(attr='user_name'),
+        return render_template('index.html', user_name=ut.get(attr='user_name'),
                                user_description=ut.get(attr='user_description'))
 
 

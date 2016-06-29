@@ -71,7 +71,7 @@ fieldset legend {
 }
 
 #profile-image-inset {
-    box-shadow: 0px 2px 3px #000000;
+    box-shadow: 0px .2em .3em #000000;
 }
 
 #profile-image {
@@ -80,13 +80,11 @@ fieldset legend {
     padding-right: 10px;
     padding-bottom: 10px;
     padding-left: 10px;
-    z-index: 0;
 }
-
 #modalTitle {
     font-family: 'railway';
 }
-
-.title-bar{
-    box-shadow          : 0em .2em .1em #d0d0d0;
+div.primary.title-bar{
+    background: url('/profilePicture_header') no-repeat center center fixed;
+    background-size: cover;
 }
