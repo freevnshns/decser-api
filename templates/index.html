@@ -34,14 +34,18 @@
             <br>
         </div>
         <div class="large-6 columns">
-            <h3 class="show-for-small" id="user-name">
-                {{user_name}}
+            <div class="show-for-small">
+                <h3 id="user-name">
+                    {{user_name}}
+                </h3>
                 <hr/>
-            </h3>
-            <h1 class="hide-for-small" id="user-name">
-                {{user_name}}
+            </div>
+            <div class="hide-for-small">
+                <h1 id="user-name">
+                    {{user_name}}
+                </h1>
                 <hr/>
-            </h1>
+            </div>
             <a href="#" data-reveal-id="description-change-modal">
                 <h4 class="subheader hide-for-small" id="user-info">
                     {{user_description}}
@@ -225,9 +229,6 @@
     });
     var triggerLink = document.getElementById("chat_message");
     triggerLink.addEventListener('keyup', send_chat_message, false);
-
-
-
 
 
 
