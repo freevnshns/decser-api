@@ -10,7 +10,7 @@ class MessageTable:
         self.NAME = "messages_table"
 
         self.COLUMN_MESSAGE_ID = "mid"
-        self.COLUMN_MESSAGE_ID_TYPE = "INT NOT NULL AUTOINCREMENT"
+        self.COLUMN_MESSAGE_ID_TYPE = "INT"
 
         self.COLUMN_MESSAGE_DATE = "message_date"
         self.COLUMN_MESSAGE_DATE_TYPE = "date"
