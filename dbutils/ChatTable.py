@@ -69,4 +69,4 @@ class ChatTable:
         if results:
             return results
         else:
-            return False
+            return []
