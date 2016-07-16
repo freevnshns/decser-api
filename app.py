@@ -64,7 +64,7 @@ def initialization():
         return '''
         <!doctype html>
         <title>First time login</title>
-        <h1>Upload a Picture of yours</h1>
+        <h1>Enter you details</h1>
         <form action="" method=post enctype=multipart/form-data>
             Name : <input type=text name=user_name>
             About yourself : <input type=text name=user_description>
@@ -213,4 +213,4 @@ def retrieve_chat():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    app.run(host="0.0.0.0", debug=True, threaded=True)

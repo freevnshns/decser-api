@@ -46,13 +46,15 @@ class ChatTable:
             message, sender)
         try:
             self.cursor.execute(query)
+            data = self.dbConnection.get()
+            data.commit()
+            return True
         except Error as e:
             print e
             if str(e) == ("no such table: " + self.NAME):
                 self.create()
                 self.insert(message, sender)
-        data = self.dbConnection.get()
-        data.commit()
+        return False
 
     def get(self):
         query = "SELECT " + self.COLUMN_MESSAGE_SENDER + "," + self.COLUMN_MESSAGE_DATE + "," + self.COLUMN_MESSAGE_TIME + ',' + self.COLUMN_MESSAGE_DATA + " FROM (" + "SELECT " + self.COLUMN_MESSAGE_SENDER + "," + self.COLUMN_MESSAGE_DATE + ',' + self.COLUMN_MESSAGE_TIME + "," + self.COLUMN_MESSAGE_DATA + " FROM " + self.NAME + " ORDER BY " + self.COLUMN_MESSAGE_DATE + ',' + self.COLUMN_MESSAGE_TIME + " ASC ) sub ORDER BY " + self.COLUMN_MESSAGE_DATE + ',' + self.COLUMN_MESSAGE_TIME + " ASC;"
@@ -67,4 +69,4 @@ class ChatTable:
         if results:
             return results
         else:
-            return 0
+            return False
