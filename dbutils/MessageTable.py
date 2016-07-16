@@ -75,4 +75,4 @@ class MessageTable:
         if results:
             return results
         else:
-            return False
+            return []

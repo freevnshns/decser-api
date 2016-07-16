@@ -57,7 +57,7 @@ class FileTable:
         if results:
             return results
         else:
-            return False
+            return []
 
     def remove(self, file_name):
         query = "DELETE FROM " + self.NAME + " WHERE " + self.COLUMN_FILE_NAME + "='" + file_name + "';"
