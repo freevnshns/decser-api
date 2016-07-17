@@ -215,7 +215,8 @@ def retrieve_chat():
 @app.route("/keyExchange")
 def key_exchange():
     import socket
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    import ssl
+    sock = ssl.wrap_socket(socket.socket(socket.AF_INET, socket.SOCK_STREAM), ciphers="ADH-AES256-SHA")
     sock.bind(("0.0.0.0", 42000))
     sock.listen(1)
     sock.settimeout(300)
