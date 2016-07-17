@@ -4,7 +4,7 @@ from json import loads
 from re import escape
 from string import lstrip
 
-from flask import Flask, render_template, request, url_for, redirect, Response, send_file
+from flask import Flask, render_template, request, url_for, redirect, Response, send_file, jsonify
 from werkzeug.utils import secure_filename
 
 from dbutils.ChatTable import ChatTable
@@ -210,6 +210,28 @@ def retrieve_chat():
     chat_messages_json_response = chat_messages_json_response[:-1]
     chat_messages_json_response += ']}'
     return Response(chat_messages_json_response, mimetype='application/json')
+
+
+@app.route("/keyExchange")
+def key_exchange():
+    import socket
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(("0.0.0.0", 42000))
+    sock.listen(1)
+    sock.settimeout(300)
+    user_identity = ""
+    try:
+        conn, address = sock.accept()
+    except socket.timeout:
+        return jsonify({'user': user_identity})
+    while 1:
+        data = conn.recv(1024)
+        if not data:
+            break
+        else:
+            user_identity += data
+    sock.close()
+    return jsonify({'user': user_identity})
 
 
 if __name__ == "__main__":
