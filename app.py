@@ -215,8 +215,7 @@ def retrieve_chat():
 @app.route("/keyExchange")
 def key_exchange():
     import socket
-    import ssl
-    sock = ssl.wrap_socket(socket.socket(socket.AF_INET, socket.SOCK_STREAM), ciphers="ADH-AES256-SHA")
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.bind(("0.0.0.0", 42000))
     sock.listen(1)
     sock.settimeout(300)
@@ -233,6 +232,42 @@ def key_exchange():
             user_identity += data
     sock.close()
     return jsonify({'user': user_identity})
+
+
+@app.route("/doKeyExchangeWith<email>", methods=["GET"])
+def do_key_exchange(email):
+    import socket
+    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+    sock.bind(("0.0.0.0", 42000))
+    sock.listen(1)
+    sock.settimeout(300)
+    user_identity = ""
+    success = False
+    try:
+        conn, address = sock.accept()
+        while True:
+            data_email = conn.recv(1024)
+            if not data_email:
+                break
+            else:
+                user_identity += data_email
+                conn.shutdown(socket.SHUT_RD)
+        user_identity = unicode(user_identity, "utf-8")
+        if email == user_identity:
+            with open(app.config['DATA_DIR'] + 'limited-user_key', "rb") as file_stream:
+                data = file_stream.read(1024)
+                while data:
+                    conn.send(data)
+                    data = file_stream.read(1024)
+            success = True
+            subprocess.check_call(
+                ["/bin/bash", "prosodyctl register", str(email).split("@")[0], "sinecos.local", "abcd"])
+    except socket.timeout as e:
+        print e
+    finally:
+        sock.shutdown(socket.SHUT_RDWR)
+        sock.close()
+        return jsonify({'success': success})
 
 
 if __name__ == "__main__":
