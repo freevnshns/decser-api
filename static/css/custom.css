@@ -1,51 +1,19 @@
-@font-face {
-    font-family: 'railway';
-    src: url('../fonts/railway/railway-webfont.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'Cinzel-DecorativeBold';
-    src: url('../fonts/cinzel-bold/CinzelDecorative-Bold.otf') format('opentype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'alex';
-    src: url('../fonts/alex/alex.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'stentiga';
-    src: url('../fonts/stentiga/stentiga.ttf') format('truetype');
-    font-weight: normal;
-    font-style: normal;
-}
-
-#user-name {
-    font-family: 'stentiga';
+.user-name {
     color: white;
     text-shadow: 0px 2px 3px #000000;
 }
 
-#user-info {
-    font-family: 'alex';
+.user-info {
     color: white;
     text-shadow: 0px 2px 3px #000000;
-}
-
-#logo-font {
-    font-family: 'Cinzel-DecorativeBold';
 }
 
 nav {
     box-shadow: 0px 2px 5px #000000;
 }
-
+.top-bar{
+background-color: #ff9900;
+}
 header {
     padding-top: 2px;
     background: url('/profilePicture_header') no-repeat center center fixed;
@@ -54,16 +22,21 @@ header {
     box-shadow: 0px 2px 5px #000000;
 }
 
-#control-panel {
+div.primary.title-bar{
+    background: url('/profilePicture_header') no-repeat center center fixed;
+    background-size: cover;
+}
+
+.control-panel {
     padding-top: 10px;
 }
 
-#panel-material {
+.panel-material {
     box-shadow: 0px 1px 2px #000000;
 }
 
 body {
-    background-color: #D9D9D9;
+    background-color: #2f2f2f;
 }
 
 fieldset legend {
@@ -74,17 +47,10 @@ fieldset legend {
     box-shadow: 0px .2em .3em #000000;
 }
 
-#profile-image {
+.profile-image {
     position: relative;
     padding-top: 10px;
     padding-right: 10px;
     padding-bottom: 10px;
     padding-left: 10px;
-}
-#modalTitle {
-    font-family: 'railway';
-}
-div.primary.title-bar{
-    background: url('/profilePicture_header') no-repeat center center fixed;
-    background-size: cover;
 }

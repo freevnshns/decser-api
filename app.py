@@ -10,7 +10,6 @@ from werkzeug.utils import secure_filename
 from dbutils.ChatTable import ChatTable
 from dbutils.DataTable import DataTable
 from dbutils.FileTable import FileTable
-from dbutils.MessageTable import MessageTable
 from dbutils.UserTable import UserTable
 
 app = Flask(__name__)
@@ -23,11 +22,11 @@ app.config['APP_DIR'] = os.environ['IHS_APP_DIR']
 
 
 def allowed_photo(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_PHOTO_EXTENSIONS
+    return '.' in filename and str(filename).lower().rsplit('.', 1)[1] in ALLOWED_PHOTO_EXTENSIONS
 
 
 def allowed_file(filename):
-    return '.' in filename and filename.rsplit('.', 1)[1] in ALLOWED_FILE_EXTENSIONS
+    return '.' in filename and str(filename).lower().rsplit('.', 1)[1] in ALLOWED_FILE_EXTENSIONS
 
 
 @app.route("/")
@@ -36,7 +35,6 @@ def home():
         UserTable().create()
         ChatTable().create()
         FileTable().create()
-        MessageTable().create()
         DataTable().set_initialization(1)
         return redirect(url_for('initialization'))
     else:
@@ -49,6 +47,7 @@ def home():
                                user_description=ut.get(attr='user_description'))
 
 
+# TODO setup xmpp account , backup account ,here...
 @app.route("/initialization", methods=['GET', 'POST'])
 def initialization():
     if request.method == 'POST':
@@ -113,23 +112,6 @@ def edit_description():
     return redirect(url_for('home'))
 
 
-@app.route("/get<category>Messages")
-def get_personal_messages(category):
-    mt = MessageTable()
-    messages = mt.get(category=category)
-    if messages is False:
-        messages_json_response = '{ "messages" : [{"count": "0"}]}'
-    else:
-        messages_json_response = '{ "messages" : [{"count": "' + str(len(messages) + 1) + '"},'
-        for message in messages:
-            message_date = lstrip(str(message[4]), 'datetime.date')
-            messages_json_response += '{"mid": "' + str(message[0]) + '", "m_data": "' + message[
-                1] + '", "m_sender": "' + message[3] + '", "m_date": "' + str(message_date) + '"},'
-        messages_json_response = messages_json_response[:-1]
-        messages_json_response += ']}'
-    return Response(messages_json_response, mimetype='application/json')
-
-
 @app.route("/uploadFiles", methods=['POST'])
 def upload_file():
     temp_file = request.files['file']
@@ -138,7 +120,7 @@ def upload_file():
         temp_file.save(os.path.join(app.config['DATA_DIR'], filename))
         ft = FileTable()
         ft.insert(filename, filename.rsplit('.', 1)[1])
-        if filename.rsplit('.', 1)[1] in {"jpg", "png", "JPG", "PNG", "jpeg", "JPEG"}:
+        if allowed_photo(filename):
             try:
                 subprocess.check_call(
                     ["/bin/bash", app.config['APP_DIR'] + "scripts/" + "create_thumbs.sh", filename],
@@ -170,7 +152,7 @@ def delete_file(filename):
     ft = FileTable()
     try:
         if not subprocess.check_call(["rm", "-f", app.config['DATA_DIR'] + filename + "_thumbs.png"],
-                                     shell=False) and not subprocess.check_call(
+                                     shell=False) or not subprocess.check_call(
             ["rm", "-f", app.config['DATA_DIR'] + filename], shell=False):
             ft.remove(filename)
     except subprocess.CalledProcessError as e:
@@ -180,7 +162,7 @@ def delete_file(filename):
 
 @app.route("/thumbnail_<file_name>")
 def get_thumbnail(file_name):
-    if file_name.rsplit('.', 1)[1] in ALLOWED_PHOTO_EXTENSIONS:
+    if allowed_photo(file_name):
         return send_file(app.config['DATA_DIR'] + file_name + "_thumbs.png", mimetype="image/png")
     else:
         return send_file(app.config['DATA_DIR'] + "icons/img_icons/document_icon.png", mimetype="image/png")
@@ -210,28 +192,6 @@ def retrieve_chat():
     chat_messages_json_response = chat_messages_json_response[:-1]
     chat_messages_json_response += ']}'
     return Response(chat_messages_json_response, mimetype='application/json')
-
-
-@app.route("/keyExchange")
-def key_exchange():
-    import socket
-    sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind(("0.0.0.0", 42000))
-    sock.listen(1)
-    sock.settimeout(300)
-    user_identity = ""
-    try:
-        conn, address = sock.accept()
-    except socket.timeout:
-        return jsonify({'user': user_identity})
-    while 1:
-        data = conn.recv(1024)
-        if not data:
-            break
-        else:
-            user_identity += data
-    sock.close()
-    return jsonify({'user': user_identity})
 
 
 @app.route("/doKeyExchangeWith<email>", methods=["GET"])

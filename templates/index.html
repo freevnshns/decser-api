@@ -18,14 +18,13 @@
 <nav class="top-bar" data-topbar role="navigation">
     <ul class="title-area">
         <li class="name">
-            <h1 id="logo-font"><a href="#">Integrated Home Server</a></h1>
-        <li>
+            <h1><a href="#">Decser</a></h1>
         </li>
     </ul>
 </nav>
 <header>
     <div class="row">
-        <div class="large-6 columns" id="profile-image">
+        <div class="large-6 columns profile-image">
             <a href="#" data-reveal-id="change-Profile-Picture">
                 <img src="/profilePicture_S"
                      srcset="/profilePicture_S 400w, /profilePicture_M 800w, /profilePicture_L 1200w"
@@ -34,53 +33,23 @@
             <br>
         </div>
         <div class="large-6 columns">
-            <div class="show-for-small">
-                <h3 id="user-name">
-                    {{user_name}}
-                </h3>
-                <hr/>
-            </div>
-            <div class="hide-for-small">
-                <h1 id="user-name">
-                    {{user_name}}
-                </h1>
-                <hr/>
-            </div>
+            <h3 class="user-name">
+                {{user_name}}
+            </h3>
+            <hr/>
             <a href="#" data-reveal-id="description-change-modal">
-                <h4 class="subheader hide-for-small" id="user-info">
+                <h4 class="subheader user-info">
                     {{user_description}}
                 </h4>
-            </a>
-            <a href="/editDescription">
-                <h3 class="subheader show-for-small" id="user-info">
-                    {{user_description}}
-                </h3>
             </a>
         </div>
     </div>
 </header>
-<div class="row" id="control-panel">
-    <div class="large-6 columns">
-        <div class="radius panel" id="panel-material">
+<div class="row control-panel">
+    <div class="large-12 columns">
+        <div class="radius panel panel-material">
             <fieldset>
-                <legend>Inbox</legend>
-                <div class="row collapse">
-                    <div class="large-3 small-5 columns">
-                        <a href="#" data-reveal-id="personal-message-modal" onclick="loadMessages('personal');"
-                           class="prefix button expand">Personal</a>
-                    </div>
-                    <div class="large-3 small-5 columns">
-                        <a href="#" data-reveal-id="work-message-modal" onclick="loadMessages('work')"
-                           class="postfix button expand">Work</a>
-                    </div>
-                </div>
-            </fieldset>
-        </div>
-    </div>
-    <div class="large-6 columns">
-        <div class="radius panel" id="panel-material">
-            <fieldset>
-                <legend>File Sharing</legend>
+                <legend>Shared Files</legend>
                 <div class="row collapse">
                     <div class="large-3 small-5 columns">
                         <a href="#" data-reveal-id="file-upload-modal" class="prefix button expand"
@@ -104,14 +73,14 @@
 </div>
 <div class="row chat">
     <div class="large-12 columns">
-        <div class="radius panel" id="panel-material">
+        <div class="radius panel panel-material">
             <ul id="chat_message_box">
                 <!-- <li></li> -->
             </ul>
         </div>
     </div>
 </div>
-<div class="row panel chat" id="panel-material">
+<div class="row panel chat panel-material">
     <fieldset>
         <legend>Shoutbox</legend>
         <div class="large-8 small-8 columns">
@@ -122,42 +91,11 @@
         </div>
     </fieldset>
 </div>
-<div id="personal-message-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true"
-     role="dialog">
-    <h3 id="modalTitle">
-        Personal Messages :
-    </h3>
-    <ul class="accordion" id="messages-list-personal" data-accordion>
-        <!-- <li class="accordion-navigation">
-            <a href="#panel1">Accordion</a>
-            <div id="panel1" class="content">
-                MessageText
-            </div>
-        </li> -->
-    </ul>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
-<div id="work-message-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true"
-     role="dialog">
-    <h3 id="modalTitle">
-        Work-related Messages
-    </h3>
-    <ul class="accordion" id="messages-list-work" data-accordion>
-        <!-- <li class="accordion-navigation">
-            <a href="#panel1">Accordion</a>
-            <div id="panel1" class="content">
-                MessageText
-            </div>
-        </li> -->
-    </ul>
-    <a class="close-reveal-modal" aria-label="Close">&#215;</a>
-</div>
 <div id="file-upload-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true"
      role="dialog">
-    <h3 id="modalTitle">
+    <h3>
         Select a file to upload
     </h3>
-
     <form action="/uploadFiles" method=post enctype=multipart/form-data>
         <p>
             <input type=file name=file>
@@ -170,7 +108,7 @@
 </div>
 <div id="file-delete-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true"
      role="dialog">
-    <h3 id="modalTitle">
+    <h3>
         Select file to delete
     </h3>
     <ul id="file-list-delete" class="small-block-grid-2 medium-block-grid-3 large-block-grid-4">
@@ -180,7 +118,7 @@
 </div>
 <div id="description-change-modal" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true"
      role="dialog">
-    <h3 id="modalTitle">
+    <h3>
         Enter a new description for yourself
     </h3>
 
@@ -192,10 +130,9 @@
 </div>
 <div id="change-Profile-Picture" class="reveal-modal" data-reveal aria-labelledby="modalTitle" aria-hidden="true"
      role="dialog">
-    <h3 id="modalTitle">
+    <h3>
         Change your Display Picture
     </h3>
-
     <form action="/changeProfilePicture" method=post enctype=multipart/form-data>
         <p>
             <input type=file name=file>
@@ -229,10 +166,6 @@
     });
     var triggerLink = document.getElementById("chat_message");
     triggerLink.addEventListener('keyup', send_chat_message, false);
-
-
-
 </script>
 </body>
-
 </html>
