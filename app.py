@@ -259,9 +259,10 @@ def do_key_exchange(email):
                 while data:
                     conn.send(data)
                     data = file_stream.read(1024)
+            from xmlrpclib import ServerProxy
+            s = ServerProxy("http://127.0.0.1:8080/")
+            s.add_xmpp_user(email)
             success = True
-            subprocess.check_call(
-                ["/bin/bash", "prosodyctl register", str(email).split("@")[0], "sinecos.local", "abcd"])
     except socket.timeout as e:
         print e
     finally:
