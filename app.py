@@ -183,11 +183,15 @@ def retrieve_chat():
     return Response(chat_messages_json_response, mimetype='application/json')
 
 
-@app.route("/doKeyExchangeWith<email>", methods=["GET"])
+# TODO Convert this to POST request
+@app.route("/dKE<email>", methods=["GET"])
 def do_key_exchange(email):
     import socket
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
-    sock.bind(("0.0.0.0", 42000))
+    try:
+        sock.bind(("0.0.0.0", 42000))
+    except socket.error as e:
+        print e
     sock.listen(1)
     sock.settimeout(300)
     user_identity = ""
@@ -210,8 +214,8 @@ def do_key_exchange(email):
                     data = file_stream.read(1024)
             from xmlrpclib import ServerProxy
             s = ServerProxy("http://127.0.0.1:8080/")
-            s.add_xmpp_user(email)
-            success = True
+            if s.add_xmpp_user(str(email)):
+                success = True
     except socket.timeout as e:
         print e
     finally:
