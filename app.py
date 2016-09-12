@@ -14,19 +14,17 @@ from dbutils.UserTable import UserTable
 
 app = Flask(__name__)
 
-ALLOWED_PHOTO_EXTENSIONS = {'png', 'jpg', 'jpeg'}
-ALLOWED_FILE_EXTENSIONS = {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif', 'mp3', 'flac', 'm4a', 'mp4', 'apk'}
-
 app.config['DATA_DIR'] = os.environ['IHS_DATA_DIR']
 app.config['APP_DIR'] = os.environ['IHS_APP_DIR']
 
 
 def allowed_photo(filename):
-    return '.' in filename and str(filename).lower().rsplit('.', 1)[1] in ALLOWED_PHOTO_EXTENSIONS
+    return '.' in filename and str(filename).lower().rsplit('.', 1)[1] in {'png', 'jpg', 'jpeg'}
 
 
 def allowed_file(filename):
-    return '.' in filename and str(filename).lower().rsplit('.', 1)[1] in ALLOWED_FILE_EXTENSIONS
+    return '.' in filename and str(filename).lower().rsplit('.', 1)[1] in {'txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif',
+                                                                           'mp3', 'flac', 'm4a', 'mp4', 'apk'}
 
 
 @app.route("/")
@@ -40,7 +38,7 @@ def home():
     else:
         pass
     ut = UserTable()
-    if ut.get(attr='user_name') is None:
+    if ut.get(attr='user_name') in [None, '']:
         return redirect(url_for('initialization'))
     else:
         return render_template('index.html', user_name=ut.get(attr='user_name'),
@@ -58,26 +56,9 @@ def initialization():
             ut.insert(user_name, user_description)
         else:
             ut.insert(user_name)
-        return redirect(url_for('home'))
+        return redirect('/owncloud')
     else:
-        return '''
-        <!doctype html>
-        <title>First time login</title>
-        <h1>Enter you details</h1>
-        <form action="" method=post enctype=multipart/form-data>
-            Name : <input type=text name=user_name>
-            About yourself : <input type=text name=user_description>
-             <input type=submit value=Done>
-        </form>
-        '''
-
-
-@app.route("/profilePicture_<size>")
-def profile_picture(size):
-    try:
-        return send_file(app.config['DATA_DIR'] + "profilePicture_" + size + ".jpg", mimetype="image/jpeg")
-    except IOError:
-        return send_file(app.config['DATA_DIR'] + "blank.jpg", mimetype="image/jpeg")
+        return render_template('initialization.html')
 
 
 @app.route("/changeProfilePicture", methods=['GET', 'POST'])
@@ -101,6 +82,14 @@ def change_profile_picture():
          <input type=submit value=Upload>
     </form>
     '''
+
+
+@app.route("/profilePicture_<size>")
+def profile_picture(size):
+    try:
+        return send_file(app.config['DATA_DIR'] + "profilePicture_" + size + ".jpg", mimetype="image/jpeg")
+    except IOError:
+        return send_file(app.config['DATA_DIR'] + "blank.jpg", mimetype="image/jpeg")
 
 
 @app.route("/editDescription", methods=['POST'])
@@ -229,6 +218,38 @@ def do_key_exchange(email):
         sock.shutdown(socket.SHUT_RDWR)
         sock.close()
         return jsonify({'success': success})
+
+
+@app.route('/videocam')
+def video_feed():
+    import cv2
+
+    class VideoCamera(object):
+        def __init__(self):
+            self.video = cv2.VideoCapture(0)
+            self.video.set(cv2.cv.CV_CAP_PROP_FPS, 10)
+            self.video.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 320)
+            self.video.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 240)
+
+        def __del__(self):
+            self.video.release()
+
+        def get_frame(self):
+            success, image = self.video.read()
+            ret, jpeg = cv2.imencode('.jpg', image)
+            return jpeg.tobytes()
+
+    def gen(camera):
+        try:
+            while True:
+                frame = camera.get_frame()
+                yield (b'--frame\r\n'
+                       b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+        except cv2.error as e:
+            print e
+
+    return Response(gen(VideoCamera()),
+                    mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 if __name__ == "__main__":

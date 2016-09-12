@@ -6,21 +6,26 @@
     <meta http-equiv="x-ua-compatible" content="ie=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 
-    <link rel="icon" type="image/ico" href="{{url_for('static',filename='icons/favicon.ico')}}">
+    <link rel="icon" type="image/ico" href="static/icons/favicon.ico">
 
-    <link rel="stylesheet" href="{{ url_for('static',filename='css/foundation.css')}}"/>
-    <link rel="stylesheet" href="{{ url_for('static',filename='css/custom.css')}}"/>
+    <link rel="stylesheet" href="static/css/foundation.css"/>
+    <link rel="stylesheet" href="static/css/custom.css"/>
 
-    <script src="{{ url_for('static',filename='js/custom.js')}}"></script>
+    <script src="static/js/custom.js"></script>
 </head>
-
 <body>
 <nav class="top-bar" data-topbar role="navigation">
     <ul class="title-area">
         <li class="name">
-            <h1><a href="#">Decser</a></h1>
+            <h1><a href="#"><b>Decser</b></a></h1>
         </li>
     </ul>
+    <section class="top-bar-section">
+        <ul class="right">
+            <li><a href="/videocam">Video Cam</a></li>
+            <li><a href="/owncloud">Backup Cloud</a></li>
+        </ul>
+    </section>
 </nav>
 <header>
     <div class="row">
@@ -140,8 +145,8 @@
     </form>
     <a class="close-reveal-modal" aria-label="Close">&#215;</a>
 </div>
-<script src="{{ url_for('static',filename='js/jquery.js')}}"></script>
-<script src="{{ url_for('static',filename='js/foundation.js')}}"></script>
+<script src="static/js/jquery.js"></script>
+<script src="static/js/foundation.js"></script>
 <script type="text/javascript">
     "use strict";
     $(document).foundation();
@@ -166,6 +171,7 @@
     });
     var triggerLink = document.getElementById("chat_message");
     triggerLink.addEventListener('keyup', send_chat_message, false);
+
 </script>
 </body>
 </html>
