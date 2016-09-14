@@ -3,6 +3,7 @@ import subprocess
 from json import loads
 from re import escape
 from string import lstrip
+from xmlrpclib import ServerProxy
 
 from flask import Flask, render_template, request, url_for, redirect, Response, send_file, jsonify
 from werkzeug.utils import secure_filename
@@ -212,7 +213,6 @@ def do_key_exchange(email):
                 while data:
                     conn.send(data)
                     data = file_stream.read(1024)
-            from xmlrpclib import ServerProxy
             s = ServerProxy("http://127.0.0.1:8080/")
             if s.add_xmpp_user(str(email)):
                 success = True
@@ -224,7 +224,7 @@ def do_key_exchange(email):
         return jsonify({'success': success})
 
 
-@app.route('/videocam')
+@app.route("/videocam")
 def video_feed():
     import cv2
 
@@ -254,6 +254,19 @@ def video_feed():
 
     return Response(gen(VideoCamera()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
+
+
+@app.route("/powerControl<state>")
+def iot(state):
+    success = False
+    s = ServerProxy("http://127.0.0.1:8080/")
+    if state == unicode("off"):
+        if s.turn_off():
+            success = True
+    elif state == unicode("on"):
+        if s.turn_on():
+            success = True
+    return jsonify({'success': success})
 
 
 if __name__ == "__main__":
