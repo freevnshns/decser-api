@@ -259,7 +259,7 @@ def video_feed():
 @app.route("/powerControl<state>")
 def iot(state):
     s = ServerProxy("http://127.0.0.1:8080/")
-    if state == unicode(""):
+    if state == unicode("get"):
         state = s.get_power_status()
     elif state == unicode("off"):
         if s.turn_off():
