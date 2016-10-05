@@ -1,14 +1,22 @@
+import cv2
+import os
 from xmlrpclib import ServerProxy
 
-from flask import Flask, Response, jsonify
+from flask import Flask, Response, jsonify, request
 
 app = Flask(__name__)
 
 
-# TODO setup xmpp account , backup account ,here...
-@app.route("/initialization", methods=['POST'])
+@app.route("/initialization", methods=['GET', 'POST'])
 def initialization():
-    pass
+    if request.method == 'GET':
+        if os.path.exists('init_config'):
+            return jsonify({'init': True})
+        else:
+            return jsonify({'init': False})
+    else:
+        with open('init_config', 'r') as init_config:
+            init_config.write("True")
 
 
 # TODO Convert this to POST request
@@ -52,25 +60,24 @@ def do_key_exchange(email):
         return jsonify({'success': success})
 
 
+class VideoCamera(object):
+    def __init__(self):
+        self.video = cv2.VideoCapture(0)
+        self.video.set(cv2.cv.CV_CAP_PROP_FPS, 10)
+        self.video.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 320)
+        self.video.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 240)
+
+    def __del__(self):
+        self.video.release()
+
+    def get_frame(self):
+        success, image = self.video.read()
+        ret, jpeg = cv2.imencode('.jpg', image)
+        return jpeg.tobytes()
+
+
 @app.route("/videocam")
 def video_feed():
-    import cv2
-
-    class VideoCamera(object):
-        def __init__(self):
-            self.video = cv2.VideoCapture(0)
-            self.video.set(cv2.cv.CV_CAP_PROP_FPS, 10)
-            self.video.set(cv2.cv.CV_CAP_PROP_FRAME_WIDTH, 320)
-            self.video.set(cv2.cv.CV_CAP_PROP_FRAME_HEIGHT, 240)
-
-        def __del__(self):
-            self.video.release()
-
-        def get_frame(self):
-            success, image = self.video.read()
-            ret, jpeg = cv2.imencode('.jpg', image)
-            return jpeg.tobytes()
-
     def gen(camera):
         try:
             while True:
@@ -79,6 +86,7 @@ def video_feed():
                        b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
         except cv2.error as e:
             print e
+            exit(1)
 
     return Response(gen(VideoCamera()),
                     mimetype='multipart/x-mixed-replace; boundary=frame')
